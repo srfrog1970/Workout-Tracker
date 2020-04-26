@@ -9,10 +9,10 @@ const WorkoutSchema = new Schema({
     type: Date,
     default: Date.now,
   },
-  exercise: [
+  exercises: [
     {
       type: Schema.Types.ObjectId,
-      ref: "Exercise",
+      ref: "exercise", // reference the name of the document.
     },
   ],
 });
