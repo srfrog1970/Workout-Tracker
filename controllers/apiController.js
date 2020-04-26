@@ -11,18 +11,60 @@ router.post("/api/exercise", (req, res) => {
   });
 });
 
-router.post("/api/workout", (req, res) => {
-  db.Workout.insertMany(req.body, (error, data) => {
-    if (error) {
-      res.send(error);
-    } else {
-      res.send(data);
-    }
+router.post("/api/workouts", (req, res) => {
+  // Insert the workout
+  workoutdata = { day: new Date() };
+  db.Workout.insertMany(workoutdata)
+    .then((data) => {
+      return res.json(data);
+    })
+    .catch((err) => {
+      console.error(err);
+      process.exit(1);
+    });
+});
+
+router.put("/api/workouts/:id", async (req, res) => {
+  await db.Exercise.insertMany(req.body).then(async (dbexercise) => {
+    // Find the workout and push the array of exercise ids.
+    await db.Workout.findOneAndUpdate(
+      { _id: req.params.id },
+      {
+        $push: {
+          exercises: dbexercise.map((element, key) => element._id),
+        },
+      },
+      // TODO: Not sure what this does
+      { new: true }
+    )
+      .then((data) => {
+        return res.json(data);
+      })
+      .catch((err) => {
+        console.error(err);
+        process.exit(1);
+      });
   });
 });
 
 router.get("/api/workouts", (req, res) => {
   db.Workout.find({}) // Collection (Table) and query type
+    .limit()
+    .sort({ day: "asc" })
+    .populate({ path: "exercises", model: "Exercise" })
+    .exec()
+    .then(function (docs, err) {
+      if (err) {
+        return res.json(err);
+      }
+      return res.json(docs);
+    });
+});
+
+router.get("/api/workouts/range", (req, res) => {
+  db.Workout.find({
+    day: { $gte: new Date().setDate(new Date().getDate() - 7) },
+  }) // Collection (Table) and query type
     .limit()
     .sort({ day: "asc" })
     .populate({ path: "exercises", model: "Exercise" })
@@ -69,38 +111,5 @@ router.delete("/api/delete/workout", (req, res) => {
     }
   });
 });
-
-router.post("/api/exercise/:id", (req, res) => {
-  db.Exercise.findOneAndUpdate(
-    { _id: db.ObjectId(req.params.id) },
-    req.body,
-    (error, data) => {
-      if (error) {
-        res.send(error);
-      } else {
-        res.send(data);
-      }
-    }
-  );
-});
-
-// function queryDatabase(day, exercisesArray){
-
-//   .then(() => db.Workout.collection.insert(day))
-//   .then(() => db.Exercise.collection.insertMany(exercisesArray))
-//   .then(dbExercises => {
-//     return db.Workout.findOneAndUpdate({}, { $push: { exercises: dbExercises.ops.map((element, key) => element._id)}},
-//     { new: true })
-//   })
-//   // findOneAndUpdate the Workout document with the ObjectIds of the exercises we just created
-//   .then(data => {
-//     console.log('WORKOUT: ', data)
-//     // console.log(data.result.n + " records inserted!");
-//   })
-//   .catch(err => {
-//     console.error(err);
-//     process.exit(1);
-//   });
-// }
 
 module.exports = router;

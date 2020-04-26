@@ -31,8 +31,8 @@ const exercisesDay1 = [
     sets: 4,
   },
   {
-    type: "resistance",
-    name: "Bench",
+    type: "cardio",
+    name: "jog",
     duration: 30,
     distance: 2,
   },
@@ -119,29 +119,3 @@ async function initSeeds() {
   process.exit(0);
 }
 initSeeds();
-
-// TODO: Why do I need to use the "async/await" here?  Even the Workout.insertMany doesn't work?!?!
-// async function queryDatabase(day, exercisesArray) {
-//   await db.Workout.insertMany(day)
-//     .then(() => db.Exercise.insertMany(exercisesArray))
-//     .then((dbExercises) => {
-//       return db.Workout.findOneAndUpdate(
-//         {},
-//         {
-//           $push: {
-//             exercises: dbExercises.map((element, key) => element._id),
-//           },
-//         },
-//         { new: true }
-//       );
-//     })
-//     // findOneAndUpdate the Workout document with the ObjectIds of the exercises we just created
-//     .then((data) => {
-//       console.log("WORKOUT: ", data);
-//       // console.log(data.result.n + " records inserted!");
-//     })
-//     .catch((err) => {
-//       console.error(err);
-//       process.exit(1);
-//     });
-// }

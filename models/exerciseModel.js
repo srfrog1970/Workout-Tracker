@@ -23,6 +23,9 @@ const ExerciseSchema = new Schema({
   sets: {
     type: Number,
   },
+  distance: {
+    type: Number,
+  },
 });
 
 // Declare the model
