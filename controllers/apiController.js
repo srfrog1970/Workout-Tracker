@@ -23,14 +23,15 @@ router.post("/api/workout", (req, res) => {
 
 router.get("/api/workouts", (req, res) => {
   db.Workout.find({}) // Collection (Table) and query type
-    .sort({})
-    .populate() //Set up to populate a child
-    .exec() // Execute the query
-    .then((dbDoc) => {
-      res.json(dbDoc);
-    })
-    .catch((err) => {
-      res.json(err);
+    .limit()
+    .sort({ day: "asc" })
+    .populate({ path: "exercises", model: "Exercise" })
+    .exec()
+    .then(function (docs, err) {
+      if (err) {
+        return res.json(err);
+      }
+      return res.json(docs);
     });
 });
 
